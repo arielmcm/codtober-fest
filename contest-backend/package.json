@@ -9,7 +9,6 @@
     "lint": "eslint ./app",
     "start": "node .",
     "posttest": "npm run lint",
-    "precommit": "eslint ./app  && jest",
     "model": "node model-generator.js",
     "test": "node scripts/test.js --env=node",
     "test-watch": "node_modules/nodemon/bin/nodemon.js node_modules/jasmine/bin/jasmine.js"
