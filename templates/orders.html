@@ -69,6 +69,7 @@
         <tr class="d-flex">
             <td class="col-3">
                 {{name}}
+                <div style="display: none" class="hiddenId">{{id}}</div>
             </td>
             <td class="col-4">
                 {{address}}
@@ -78,7 +79,7 @@
             </td>
             <td class="col-2">
                 <div class="text-center">
-                    <a class="btn btn-success btn-sm view-order" href="/order-detail.html">View</a>
+                    <a class="btn btn-success btn-sm view-order" href="/order-detail.html?orderId={{id}}">View</a>
                 </div>
             </td>
         </tr>

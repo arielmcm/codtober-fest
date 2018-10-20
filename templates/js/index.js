@@ -1,3 +1,13 @@
+function fetchData (url) {
+  return fetch(url, {
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+    },
+  })
+    .then(res => res.json());
+}
+
 /**
  * POST the order on /pizza
  * @param order 
@@ -8,7 +18,7 @@
  * ****************************
  */
 function postOrder(order) {
-    fetch('/pizza', {
+  fetch('http://0.0.0.0:3008/contest-backend/v1/orders', {
         method: 'POST',
         body: JSON.stringify(order),
         headers: {
@@ -58,3 +68,41 @@ function showNotification() {
     orderAlert.toggle()
     setTimeout(() => orderAlert.toggle(), 5000);
 }
+
+
+function renderSizes () {
+  fetchData('http://0.0.0.0:3008/contest-backend/v1/sizes')
+    .then(sizes => {
+        let inputId;
+      sizes.forEach((size, index) => {
+        inputId = `sizesRadio${index}`;
+        $("#sizes").append([
+          '<div class="form-check">',
+          `<input value="${size.name}" required name="size" class="form-check-input" type="radio" id="${inputId}">`,
+          `<label class="form-check-label" for="${inputId}">`,
+          `${size.name} - $${size.price}`,
+          '</label></div>'
+        ].join(''));
+      });
+    });
+}
+
+function renderIngredients () {
+  fetchData('http://0.0.0.0:3008/contest-backend/v1/ingredients')
+    .then(ingredients => {
+      let inputId;
+      ingredients.forEach((ingredient, index) => {
+        inputId = `ingredientsCheckbox${index}`;
+        $("#ingredients").append([
+          '<div class="form-check">',
+          `<input value="${ingredient.name}" name="ingredients" class="form-check-input" type="checkbox" id="${inputId}">`,
+          `<label class="form-check-label" for="${inputId}">`,
+          `${ingredient.name} - $${ingredient.price}`,
+          '</label></div>'
+        ].join(''));
+      });
+    });
+}
+
+renderSizes();
+renderIngredients();

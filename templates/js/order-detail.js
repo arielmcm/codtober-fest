@@ -1,7 +1,8 @@
 /**
  * Set the id to query the order
  */
-let id = 1;
+let urlParams = new URLSearchParams(window.location.search);
+let orderId = urlParams.get('orderId');
 
 /**
  * Fetchs de order detail and appends to the page.
@@ -11,7 +12,7 @@ let id = 1;
  * with your service endpoint below
  * ****************************
  */
-fetch(`json/order.json?id=${id}`)
+fetch(`http://0.0.0.0:3008/contest-backend/v1/orders/${orderId}`)
     .then(response => response.json())
     .then(order => {
         let template = createRowTemplate(order);

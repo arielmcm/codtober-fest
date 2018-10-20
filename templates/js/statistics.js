@@ -5,7 +5,7 @@
  * with your service endpoint below
  * ****************************
  */
-fetch('json/statistics.json')
+fetch('http://0.0.0.0:3008/contest-backend/v1/statistics')
     .then(response => response.json())
     .then(statistics => {
         let template = createStatisticsTemplate(statistics);
