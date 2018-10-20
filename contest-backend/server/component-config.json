@@ -1,0 +1,9 @@
+{
+  "loopback-component-explorer": {
+    "mountPath": "/projects-api/explorer",
+    "uiDirs": "server/explorer",
+    "apiInfo": {
+      "title": "F7 Projects API"
+    }
+  }
+}

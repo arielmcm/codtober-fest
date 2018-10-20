@@ -1,0 +1,53 @@
+pipeline {
+  agent {
+    label 'docker'
+  }
+  environment {
+    AWS_CREDENTIALS = credentials('aws-frontier7-new-platform-2')
+  }
+  stages {
+    stage('test') {
+      agent {
+        docker {
+          image 'rvntone/node:8-withrsync'
+          args '-v $HOME/yarn-cache:/home/node/.cache/yarn'
+        }
+      }
+      steps {
+        catchError() {
+          sh 'yarn --frozen-lockfile && yarn run test --coverage'
+        }
+      }
+      post {
+        failure {
+          error 'Tests failed'
+        }
+      }
+    }
+    stage('deploy-to-test') {
+      agent {
+        docker {
+          image 'rvntone/node:8-withrsync'
+          args '-v $HOME/yarn-cache:/home/node/.cache/yarn'
+        }
+      }
+      when { 
+        expression { 
+          return env.BRANCH_NAME == 'release';
+        } 
+      }
+      steps {
+        sh 'yarn --frozen-lockfile'
+        sh ("""
+          sed -i -e "s/frontier7\\.devsu\\.us/test\\.frontier7\\.com/" app/resources/resources-mapping/remote-methods.js
+        """)
+        sh 'grep "ec2-34-238-55-185.compute-1.amazonaws.com" ~/.ssh/known_hosts || mkdir -p ~/.ssh && ssh-keyscan -t rsa ec2-34-238-55-185.compute-1.amazonaws.com >> ~/.ssh/known_hosts'
+        sh "rsync -Pav -e 'ssh -i ${env.AWS_CREDENTIALS}' ./ ubuntu@ec2-34-238-55-185.compute-1.amazonaws.com:data/projects/frontier7/prod/f7-projects-api"
+      }
+    }
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '20', daysToKeepStr: '20'))
+  }
+  post { always { sendSlackNotification workspace: 'frontier-7', channel: '#jenkins-deployment' } }
+}

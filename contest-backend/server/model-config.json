@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models",
+      "../app/resources/ingredient",
+      "../app/resources/size",
+      "../app/resources/order",
+      "../app/resources/customer",
+      "../app/resources/statistic",
+      "../app/resources/statistic",
+      "../app/resources/statistic"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../common/mixins",
+      "./mixins"
+    ]
+  },
+  "Ingredient": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "Size": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "Order": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "Customer": {
+    "dataSource": "mongodb",
+    "public": true
+  },
+  "Statistic": {
+    "dataSource": "mongodb",
+    "public": true
+  }
+}

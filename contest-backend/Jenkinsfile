@@ -1,0 +1,67 @@
+pipeline {
+  agent {
+    label 'docker'
+  }
+  environment {
+    AWS_CREDENTIALS = credentials('aws-frontier7-new-platform-2')
+  }
+  stages {
+    stage('test') {
+      agent {
+        docker {
+          image 'rvntone/node:8-withrsync'
+          args '-v $HOME/yarn-cache:/home/node/.cache/yarn'
+        }
+        
+      }
+      steps {
+        catchError() {
+          sh 'yarn --frozen-lockfile && yarn run test --coverage'
+        }
+        
+      }
+      post {
+        failure {
+          error 'Tests failed'
+          
+        }
+        
+      }
+    }
+    stage('deploy') {
+      parallel {
+        stage('master') {
+          agent {
+            docker {
+              image 'rvntone/node:8-withrsync'
+              args '-v $HOME/yarn-cache:/home/node/.cache/yarn'
+            }
+          }
+          when { branch 'master1' }
+          steps {
+            sh 'yarn --frozen-lockfile'
+            sh 'grep "ec2-34-239-196-172.compute-1.amazonaws.com" ~/.ssh/known_hosts || mkdir -p ~/.ssh && ssh-keyscan -t rsa ec2-34-239-196-172.compute-1.amazonaws.com >> ~/.ssh/known_hosts'
+            sh "rsync -Pav -e 'ssh -i ${env.AWS_CREDENTIALS}' ./ ubuntu@charlie:data/projects/frontier7/prod/f7-projects-api"
+          }
+        }
+        stage('release') {
+          agent {
+            docker {
+              image 'rvntone/node:8-withrsync'
+              args '-v $HOME/yarn-cache:/home/node/.cache/yarn'
+            }
+          }
+          when { branch 'release' }
+          steps {
+            sh 'yarn --frozen-lockfile'
+            sh 'grep "ec2-34-239-196-172.compute-1.amazonaws.com" ~/.ssh/known_hosts || mkdir -p ~/.ssh && ssh-keyscan -t rsa ec2-34-239-196-172.compute-1.amazonaws.com >> ~/.ssh/known_hosts'
+            sh "rsync -Pav -e 'ssh -i ${env.AWS_CREDENTIALS}' ./ ubuntu@ec2-34-239-196-172.compute-1.amazonaws.com:data/projects/frontier7/prod/f7-projects-api"
+          }
+        }
+      }
+    }
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '20', daysToKeepStr: '20'))
+  }
+}

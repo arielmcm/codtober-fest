@@ -1,0 +1,12 @@
+{
+  "mongodb": {
+    "host": "localhost",
+    "port": 27017,
+    "database": "contest-db",
+    "password": "",
+    "user": "",
+    "name": "mongodb",
+    "connector": "mongodb",
+    "allowExtendedOperators": true
+  }
+}
